@@ -77,44 +77,34 @@ void ChargeWeightsMethod::FindWay()
 			}
 		}
 	}
-	std::vector<bool> usedVertices(pointsAmount, false);
-	usedVertices[firstPoint] = true;
-	usedVertices[secondPoint] = true;
+	std::vector<int> usedVertices(pointsAmount, 0);
+	usedVertices[firstPoint]++;
+	usedVertices[secondPoint]++;
+	edgesStates[firstPoint][secondPoint].SetState(true);
+	edgesStates[secondPoint][firstPoint].SetState(true);
 	minWay.push_back(Edge(firstPoint, secondPoint, edges[firstPoint][secondPoint].GetWeight()));
 	//////////////////////////////////////////////////////////////////////////////////////
-	for (int i = 2; i < pointsAmount; ++i) {
-		int firstPointPotentialPoint = 0;
-		double firstPointPotentialMaxCharge = 0.0;
-		for (int j = 0; j < pointsAmount; ++j) {
-			if (!usedVertices[j]) {
-				if (edgesStates[firstPoint][j].GetCharge() > firstPointPotentialMaxCharge) {
-					firstPointPotentialPoint = j;
-					firstPointPotentialMaxCharge = edgesStates[firstPoint][j].GetCharge();
+	for (int i = 1; i < pointsAmount; ++i) {
+		double maxCharge = 0.0;
+		int maxVerticeOne = 0;
+		int maxVerticeTwo = 0;
+		for (int one = 0; one < pointsAmount; ++one) {
+			for (int two = 0; two < pointsAmount; ++two) {
+				if (usedVertices[one] < 2 && usedVertices[two] < 2 &&  !edgesStates[one][two].GetState()) {
+					if (edgesStates[one][two].GetCharge() > maxCharge) {
+						maxCharge = edgesStates[one][two].GetCharge();
+						maxVerticeOne = one;
+						maxVerticeTwo = two;
+					}
 				}
 			}
 		}
-		int secondPointPotentialPoint = 0;
-		double secondPointPotentialMaxCharge = 0.0;
-		for (int j = 0; j < pointsAmount; ++j) {
-			if (!usedVertices[j]) {
-				if (edgesStates[secondPoint][j].GetCharge() > secondPointPotentialMaxCharge) {
-					secondPointPotentialPoint = j;
-					secondPointPotentialMaxCharge = edgesStates[secondPoint][j].GetCharge();
-				}
-			}
-		}
-		if (firstPointPotentialMaxCharge > secondPointPotentialMaxCharge) {
-			minWay.push_back(Edge(firstPoint, firstPointPotentialPoint, edges[firstPoint][firstPointPotentialPoint].GetWeight()));
-			firstPoint = firstPointPotentialPoint;
-			usedVertices[firstPointPotentialPoint] = true;
-		}
-		else {
-			minWay.push_back(Edge(secondPoint, secondPointPotentialPoint, edges[secondPoint][secondPointPotentialPoint].GetWeight()));
-			secondPoint = secondPointPotentialPoint;
-			usedVertices[secondPointPotentialPoint] = true;
-		}
+		usedVertices[maxVerticeOne]++;
+		usedVertices[maxVerticeTwo]++;
+		edgesStates[maxVerticeOne][maxVerticeTwo].SetState(true);
+		edgesStates[maxVerticeTwo][maxVerticeOne].SetState(true);
+		minWay.push_back(Edge(maxVerticeOne, maxVerticeTwo, edges[maxVerticeOne][maxVerticeTwo].GetWeight()));
 	}
-	minWay.push_back(Edge(firstPoint, secondPoint, edges[firstPoint][secondPoint].GetWeight()));
 	double sum = 0.0;
 	for (auto edge : minWay) {
 		std::cout << edge.GetFirstPoint() << " - " << edge.GetSecondPoint() << "\t";

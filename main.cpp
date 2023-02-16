@@ -4,7 +4,7 @@
 int main(int argc, char* argv[]) {
 	setlocale(LC_ALL, "ru");
 
-	ChargeWeightsMethod method(7);
+	ChargeWeightsMethod method(4);
 
 
 	std::cout << std::endl;
